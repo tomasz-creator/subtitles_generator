@@ -152,10 +152,108 @@ def configured_api_key() -> str:
         return ""
 
 
-st.set_page_config(page_title="Odtwarzacz wideo", page_icon="🎬", layout="centered")
+st.set_page_config(page_title="Subtitle Studio", page_icon="🎬", layout="wide")
 
-st.title("🎬 Odtwarzacz wideo")
-st.write("Prześlij plik wideo, aby odtworzyć go bezpośrednio w przeglądarce.")
+st.markdown(
+    """
+    <style>
+    .stApp { background: #000000; color: #ffffff; }
+    .block-container { max-width: 1280px; padding-top: 2rem; padding-bottom: 4rem; }
+    .stApp p, .stApp label, .stApp li, .stApp span,
+    [data-testid="stMarkdownContainer"], [data-testid="stWidgetLabel"],
+    [data-testid="stCaptionContainer"], [data-testid="stMetricLabel"],
+    [data-testid="stMetricValue"] { color: #ffffff !important; }
+    [data-testid="stSidebar"] { background: #050505; border-right: 1px solid #2f2f2f; }
+    [data-testid="stSidebar"] * { color: #ffffff !important; }
+    .hero {
+        padding: 2.2rem 2.4rem; border: 1px solid #7c3aed;
+        border-radius: 24px; margin-bottom: 1.5rem;
+        background: linear-gradient(125deg, #190b35, #090909 58%, #101b39);
+        box-shadow: 0 24px 70px rgba(0,0,0,.28);
+    }
+    .hero h1 { color: #ffffff !important; margin: 0; font-size: 2.8rem; letter-spacing: -.04em; }
+    .hero p { color: #ffffff !important; margin: .65rem 0 0; font-size: 1.05rem; }
+    .eyebrow { color: #c4b5fd !important; font-size: .78rem; font-weight: 800; letter-spacing: .14em; }
+    [data-testid="stImage"] img { border-radius: 22px; border: 1px solid #343434; }
+    .step-card {
+        min-height: 92px; padding: 1rem 1.05rem; border-radius: 16px;
+        color: #ffffff; border: 1px solid #454545; background: #0c0c0c;
+    }
+    .step-card.done { border-color: #34d399; background: #06291f; }
+    .step-number { color: #e2e8f0 !important; font-size: .72rem; font-weight: 700; }
+    .step-title { color: #ffffff !important; margin-top: .35rem; font-weight: 750; }
+    [data-testid="stVerticalBlockBorderWrapper"] {
+        background: #090909; border-color: #3b3b3b;
+        border-radius: 18px; box-shadow: 0 14px 35px rgba(0,0,0,.16);
+    }
+    [data-testid="stFileUploaderDropzone"] {
+        color: #ffffff; background: #0d0d0d; border-radius: 16px; border-color: #a78bfa;
+    }
+    [data-baseweb="input"], [data-baseweb="textarea"], [data-baseweb="select"] {
+        color: #ffffff !important; background: #050505 !important; border-color: #555555 !important;
+    }
+    [data-testid="stDataFrame"] { border: 1px solid #454545; border-radius: 12px; }
+    .stButton > button, .stDownloadButton > button,
+    [data-testid="stFileUploader"] button {
+        color: #ffffff !important;
+        background: linear-gradient(90deg, #4c1d95, #1e3a8a) !important;
+        border: 1px solid #8b5cf6 !important; border-radius: 12px; font-weight: 700;
+        transition: background-color .18s ease, border-color .18s ease, transform .18s ease;
+    }
+    .stButton > button *, .stDownloadButton > button *,
+    [data-testid="stFileUploader"] button * { color: #ffffff !important; }
+    .stButton > button:hover, .stDownloadButton > button:hover,
+    [data-testid="stFileUploader"] button:hover {
+        color: #ffffff !important;
+        background: linear-gradient(90deg, #6d28d9, #1d4ed8) !important;
+        border-color: #c4b5fd !important; transform: translateY(-1px);
+    }
+    .stButton > button:focus, .stDownloadButton > button:focus,
+    [data-testid="stFileUploader"] button:focus {
+        color: #ffffff !important;
+        background: linear-gradient(90deg, #5b21b6, #1e40af) !important;
+        border-color: #ddd6fe !important; box-shadow: 0 0 0 2px rgba(167,139,250,.35) !important;
+    }
+    .stButton > button:disabled {
+        color: #d1d5db !important; background: #181818 !important;
+        border-color: #404040 !important; opacity: .75;
+    }
+    .stButton > button[kind="primary"] {
+        border: 1px solid #a78bfa !important;
+        box-shadow: 0 8px 24px rgba(99,102,241,.28);
+    }
+    [data-testid="stMetric"] { background: #111111; border: 1px solid #333333; padding: .7rem; border-radius: 12px; }
+    </style>
+    <div class="hero">
+      <div class="eyebrow">AI VIDEO WORKSPACE</div>
+      <h1>🎬 Subtitle Studio</h1>
+      <p>Wczytaj film, wyodrębnij dźwięk, wygeneruj napisy i dopracuj je w jednym miejscu.</p>
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
+
+hero_image = Path(__file__).with_name("assets") / "cinema-hero.png"
+if hero_image.exists():
+    st.image(str(hero_image), width="stretch")
+
+with st.sidebar:
+    st.title("Subtitle Studio")
+    st.caption("Generator i edytor napisów")
+    st.divider()
+    if configured_api_key():
+        st.success("Klucz OpenAI API wykryty")
+    else:
+        st.warning("Brak klucza OpenAI API")
+    st.markdown("**Obsługiwane formaty**")
+    st.caption("MP4 · WebM · MOV · M4V")
+    st.markdown("**Limit filmu**")
+    st.caption(f"{MAX_FILE_SIZE_MB} MB")
+    st.divider()
+    st.caption("🔒 Klucz API pozostaje po stronie aplikacji.")
+
+st.subheader("1. Wczytaj materiał")
+st.caption("Wybierz film, od którego chcesz rozpocząć pracę.")
 
 uploaded_file = st.file_uploader(
     "Wybierz plik wideo",
@@ -192,63 +290,101 @@ if uploaded_file is not None:
             st.session_state.pop("audio_data", None)
             st.session_state.pop("subtitles_vtt", None)
 
-        st.success(f"Wczytano: {uploaded_file.name} ({file_size / 1024 / 1024:.1f} MB)")
         subtitles_vtt = st.session_state.get("subtitles_vtt")
-        st.video(
-            video_data,
-            format=mime_type,
-            subtitles=subtitles_vtt.encode("utf-8") if subtitles_vtt else None,
-        )
-        st.caption(
-            "Jeśli film się nie odtwarza, jego kodek może nie być obsługiwany "
-            "przez przeglądarkę. Najbardziej zgodny jest MP4 z kodekiem H.264."
-        )
-
-        st.subheader("Ścieżka dźwiękowa")
-        if st.button("Wyodrębnij dźwięk", type="primary"):
-            try:
-                with st.spinner("Wyodrębnianie dźwięku…"):
-                    st.session_state.audio_data = extract_audio(video_data, extension)
-            except subprocess.TimeoutExpired:
-                st.error("Przetwarzanie trwało zbyt długo i zostało przerwane.")
-            except (OSError, RuntimeError) as error:
-                st.error(str(error))
-
-        if audio_data := st.session_state.get("audio_data"):
-            st.audio(audio_data, format="audio/mpeg")
-            output_name = f"{Path(uploaded_file.name).stem}_audio.mp3"
-            st.download_button(
-                "Pobierz dźwięk MP3",
-                data=audio_data,
-                file_name=output_name,
-                mime="audio/mpeg",
+        audio_data = st.session_state.get("audio_data")
+        steps = [
+            ("01", "Wideo wczytane", True),
+            ("02", "Dźwięk gotowy", bool(audio_data)),
+            ("03", "Napisy wygenerowane", bool(subtitles_vtt)),
+            ("04", "Edycja i eksport", bool(subtitles_vtt)),
+        ]
+        step_columns = st.columns(4)
+        for column, (number, title, done) in zip(step_columns, steps):
+            state_class = " done" if done else ""
+            marker = "✓" if done else "○"
+            column.markdown(
+                f'<div class="step-card{state_class}"><div class="step-number">ETAP {number}</div>'
+                f'<div class="step-title">{marker} {title}</div></div>',
+                unsafe_allow_html=True,
             )
 
-            st.subheader("Napisy")
-            api_key = configured_api_key()
-            if not api_key:
-                api_key = st.text_input(
-                    "Klucz OpenAI API",
-                    type="password",
-                    help="Klucz jest używany tylko do tego żądania i nie jest zapisywany w kodzie.",
+        st.write("")
+        media_column, tools_column = st.columns([1.55, 1], gap="large")
+        with media_column:
+            with st.container(border=True):
+                st.markdown("### Podgląd filmu")
+                st.video(
+                    video_data,
+                    format=mime_type,
+                    subtitles=subtitles_vtt.encode("utf-8") if subtitles_vtt else None,
+                )
+                st.caption(
+                    "Jeśli film się nie odtwarza, jego kodek może nie być obsługiwany "
+                    "przez przeglądarkę. Najbardziej zgodny jest MP4/H.264."
                 )
 
-            if len(audio_data) >= MAX_TRANSCRIPTION_SIZE_BYTES:
-                st.warning(
-                    f"Plik audio ma {len(audio_data) / 1024 / 1024:.1f} MB. "
-                    f"API transkrypcji przyjmuje pliki mniejsze niż {MAX_TRANSCRIPTION_SIZE_MB} MB."
-                )
-            elif st.button("Wygeneruj napisy", disabled=not bool(api_key)):
-                try:
-                    with st.spinner("Generowanie napisów…"):
-                        st.session_state.subtitles_vtt = transcribe_to_vtt(audio_data, api_key)
-                    st.session_state.pop(f"subtitle_editor_{video_id}", None)
-                    st.rerun()
-                except OpenAIError as error:
-                    st.error(f"Błąd OpenAI API: {error}")
+        with tools_column:
+            with st.container(border=True):
+                st.markdown("### Materiał")
+                st.caption(uploaded_file.name)
+                metric_format, metric_size = st.columns(2)
+                metric_format.metric("Format", extension.removeprefix(".").upper())
+                metric_size.metric("Rozmiar", f"{file_size / 1024 / 1024:.1f} MB")
+
+                st.divider()
+                st.markdown("### 2. Ścieżka dźwiękowa")
+                if st.button("🎵 Wyodrębnij dźwięk", type="primary", width="stretch"):
+                    try:
+                        with st.spinner("Wyodrębnianie dźwięku…"):
+                            st.session_state.audio_data = extract_audio(video_data, extension)
+                        st.rerun()
+                    except subprocess.TimeoutExpired:
+                        st.error("Przetwarzanie trwało zbyt długo i zostało przerwane.")
+                    except (OSError, RuntimeError) as error:
+                        st.error(str(error))
+
+                if audio_data := st.session_state.get("audio_data"):
+                    st.audio(audio_data, format="audio/mpeg")
+                    output_name = f"{Path(uploaded_file.name).stem}_audio.mp3"
+                    st.download_button(
+                        "↓ Pobierz MP3",
+                        data=audio_data,
+                        file_name=output_name,
+                        mime="audio/mpeg",
+                        width="stretch",
+                    )
+
+                    st.divider()
+                    st.markdown("### 3. Generowanie napisów")
+                    api_key = configured_api_key()
+                    if not api_key:
+                        api_key = st.text_input(
+                            "Klucz OpenAI API",
+                            type="password",
+                            help="Klucz jest używany tylko do tego żądania i nie jest zapisywany w kodzie.",
+                        )
+
+                    if len(audio_data) >= MAX_TRANSCRIPTION_SIZE_BYTES:
+                        st.warning(
+                            f"Audio ma {len(audio_data) / 1024 / 1024:.1f} MB. "
+                            f"Limit API wynosi {MAX_TRANSCRIPTION_SIZE_MB} MB."
+                        )
+                    elif st.button(
+                        "✨ Wygeneruj napisy",
+                        disabled=not bool(api_key),
+                        width="stretch",
+                    ):
+                        try:
+                            with st.spinner("Generowanie napisów…"):
+                                st.session_state.subtitles_vtt = transcribe_to_vtt(audio_data, api_key)
+                            st.session_state.pop(f"subtitle_editor_{video_id}", None)
+                            st.rerun()
+                        except OpenAIError as error:
+                            st.error(f"Błąd OpenAI API: {error}")
 
         if subtitles_vtt := st.session_state.get("subtitles_vtt"):
-            st.markdown("#### Edycja napisów")
+            st.divider()
+            st.markdown("## 4. Edycja i eksport")
             st.caption(
                 "Popraw tekst lub czasy wyświetlania. Format czasu: "
                 "`MM:SS.mmm` albo `HH:MM:SS.mmm`. Możesz również dodawać i usuwać wiersze."
@@ -287,14 +423,16 @@ if uploaded_file is not None:
             transcript_name = f"{Path(uploaded_file.name).stem}_transkrypcja.txt"
             download_vtt, download_txt = st.columns(2)
             download_vtt.download_button(
-                "Pobierz napisy VTT",
+                "↓ Pobierz napisy VTT",
                 data=subtitles_vtt.encode("utf-8"),
                 file_name=subtitle_name,
                 mime="text/vtt",
+                width="stretch",
             )
             download_txt.download_button(
-                "Pobierz transkrypcję TXT",
+                "↓ Pobierz transkrypcję TXT",
                 data=transcript_text.encode("utf-8"),
                 file_name=transcript_name,
                 mime="text/plain",
+                width="stretch",
             )
